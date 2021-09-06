@@ -231,7 +231,7 @@ const removeIdentifyingInfo = async (model, options) => {
 };
 
 User.beforeDestroy(removeIdentifyingInfo);
-User.beforeSave(uploadAvatar);
+// User.beforeSave(uploadAvatar);
 User.beforeCreate(setRandomJwtSecret);
 
 // By default when a user signs up we subscribe them to email notifications
