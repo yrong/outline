@@ -1,12 +1,14 @@
 // @flow
+require("dotenv").config({ silent: true });
 import TestServer from "fetch-test-server";
 import app from "./app";
 import { buildShare, buildDocument } from "./test/factories";
 import { flushdb } from "./test/support";
-
 const server = new TestServer(app.callback());
 
-beforeEach(() => flushdb());
+beforeEach(() => {
+  flushdb();
+});
 afterAll(() => server.close());
 
 describe("/share/:id", () => {
