@@ -19,6 +19,7 @@ const providerName = "nextcloud";
 const NEXTCLOUD_APP_ID = process.env.NEXTCLOUD_APP_ID;
 const NEXTCLOUD_APP_SECRET = process.env.NEXTCLOUD_APP_SECRET;
 const NEXTCLOUD_BASE_URL = process.env.NEXTCLOUD_BASE_URL;
+const NEXTCLOUD_AVATAR_URL = process.env.NEXTCLOUD_AVATAR_URL;
 
 const scopes = [
   "identity.email",
@@ -33,14 +34,44 @@ export const config = {
 };
 
 if (NEXTCLOUD_APP_ID) {
-  const strategy = new NextcloudStrategy({
+  const strategy = new NextcloudStrategy(
+    {
       clientID: NEXTCLOUD_APP_ID,
       clientSecret: NEXTCLOUD_APP_SECRET,
       baseURL: NEXTCLOUD_BASE_URL,
-      callbackURL: `http://localhost:3000/auth/nextcloud/callback`,
     },
-    function (accessToken, refreshToken, profile, cb) {
+    function (accessToken, refreshToken, profile, done) {
       console.log(accessToken);
+      accountProvisioner({
+        ip: "localhost",
+        team: {
+          name: profile.username,
+          domain: NEXTCLOUD_BASE_URL,
+          subdomain: NEXTCLOUD_BASE_URL,
+          avatarUrl: NEXTCLOUD_AVATAR_URL,
+        },
+        user: {
+          name: profile.username,
+          email: profile.emails[0]?.value,
+          avatarUrl: NEXTCLOUD_AVATAR_URL,
+        },
+        authenticationProvider: {
+          name: providerName,
+          providerId: profile.id,
+        },
+        authentication: {
+          providerId: profile.id,
+          accessToken,
+          refreshToken,
+          scopes,
+        },
+      })
+        .then((result) => {
+          done(null, result.user, result);
+        })
+        .catch((err) => {
+          done(err, null);
+        });
     }
   );
   strategy.name = providerName;
