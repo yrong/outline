@@ -41,7 +41,8 @@ if (NEXTCLOUD_APP_ID) {
       baseURL: NEXTCLOUD_BASE_URL,
     },
     function (accessToken, refreshToken, profile, done) {
-      console.log(accessToken);
+      console.log("verified success:" + accessToken);
+      console.log(profile);
       accountProvisioner({
         ip: "localhost",
         team: {
@@ -70,6 +71,7 @@ if (NEXTCLOUD_APP_ID) {
           done(null, result.user, result);
         })
         .catch((err) => {
+          console.error(err.stack || err);
           done(err, null);
         });
     }
